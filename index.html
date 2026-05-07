@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro Clínico</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Segoe UI',sans-serif;
+}
+
+body{
+background:linear-gradient(135deg,#edf6ff,#ffffff);
+color:#203247;
+}
+
+/* LOGIN */
+
+#loginPage{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:linear-gradient(135deg,#0b6fb8,#00a6d6);
+}
+
+.login-box{
+width:400px;
+background:white;
+padding:35px;
+border-radius:20px;
+box-shadow:0 15px 35px rgba(0,0,0,.2);
+text-align:center;
+}
+
+.login-box h1{
+color:#0b6fb8;
+margin-bottom:20px;
+}
+
+.login-box input{
+width:100%;
+padding:12px;
+margin:10px 0;
+border-radius:10px;
+border:1px solid #ccc;
+font-size:15px;
+}
+
+.login-box button{
+width:100%;
+padding:12px;
+border:none;
+border-radius:10px;
+background:linear-gradient(90deg,#0b6fb8,#00a6d6);
+color:white;
+font-size:16px;
+font-weight:bold;
+cursor:pointer;
+transition:.3s;
+}
+
+.login-box button:hover{
+transform:translateY(-2px);
+}
+
+/* SISTEMA */
+
+#sistema{
+display:none;
+padding:25px;
+}
+
+header{
+background:linear-gradient(90deg,#0b6fb8,#00a6d6);
+padding:20px;
+border-radius:18px;
+color:white;
+display:flex;
+justify-content:space-between;
+align-items:center;
+box-shadow:0 8px 18px rgba(0,0,0,.12);
+}
+
+header h2{
+font-size:28px;
+}
+
+header button{
+padding:10px 15px;
+border:none;
+border-radius:10px;
+background:#e63946;
+color:white;
+font-weight:bold;
+cursor:pointer;
+}
+
+/* BOTONES */
+
+.actions{
+margin:25px 0;
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+}
+
+.actions button{
+padding:12px 18px;
+border:none;
+border-radius:10px;
+background:linear-gradient(90deg,#0b6fb8,#00a6d6);
+color:white;
+font-weight:bold;
+cursor:pointer;
+}
+
+/* FORMULARIO */
+
+.form-box{
+display:none;
+background:white;
+padding:25px;
+border-radius:18px;
+box-shadow:0 8px 20px rgba(0,0,0,.08);
+margin-bottom:25px;
+}
+
+.form-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:15px;
+}
+
+.form-box input,
+.form-box select,
+.form-box textarea{
+padding:12px;
+border-radius:10px;
+border:1px solid #ccc;
+width:100%;
+}
+
+.form-box textarea{
+resize:none;
+}
+
+/* TABLA */
+
+.table-box{
+background:white;
+padding:20px;
+border-radius:18px;
+box-shadow:0 8px 20px rgba(0,0,0,.08);
+overflow:auto;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th{
+background:#eef7ff;
+padding:14px;
+color:#0b6fb8;
+}
+
+td{
+padding:14px;
+text-align:center;
+border-top:1px solid #eee;
+}
+
+tr:hover{
+background:#f8fbff;
+}
+
+.btn-delete{
+background:#e63946;
+padding:8px 12px;
+border:none;
+border-radius:8px;
+color:white;
+cursor:pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="loginPage">
+
+<div class="login-box">
+
+<h1>REGISTRO CLÍNICO</h1>
+
+<input type="text" id="usuario" placeholder="Usuario">
+
+<input type="password" id="password" placeholder="Contraseña">
+
+<button onclick="login()">INGRESAR</button>
+
+</div>
+
+</div>
+
+<!-- SISTEMA -->
+<div id="sistema">
+
+<header>
+
+<div>
+<h2>REGISTRO CLÍNICO</h2>
+<p id="usuarioActivo"></p>
+</div>
+
+<button onclick="cerrarSesion()">Cerrar Sesión</button>
+
+</header>
+
+<div class="actions">
+
+<button onclick="mostrarFormulario()">
+➕ AGREGAR PACIENTES
+</button>
+
+</div>
+
+<!-- FORMULARIO -->
+<div class="form-box" id="formularioPaciente">
+
+<h2 style="margin-bottom:20px;color:#0b6fb8;">
+Nuevo Paciente
+</h2>
+
+<div class="form-grid">
+
+<input type="text" id="dni" placeholder="DNI">
+
+<input type="text" id="nombre" placeholder="Nombre Completo">
+
+<input type="date" id="fecha">
+
+<select id="sexo">
+<option>Masculino</option>
+<option>Femenino</option>
+</select>
+
+<input type="text" id="telefono" placeholder="Teléfono">
+
+<input type="text" id="direccion" placeholder="Dirección">
+
+</div>
+
+<br>
+
+<textarea id="observacion" rows="4" placeholder="Observaciones"></textarea>
+
+<br><br>
+
+<button onclick="guardarPaciente()">
+GUARDAR PACIENTE
+</button>
+
+</div>
+
+<!-- TABLA -->
+<div class="table-box">
+
+<h2 style="margin-bottom:20px;color:#0b6fb8;">
+Pacientes Registrados
+</h2>
+
+<table id="tablaPacientes">
+
+<tr>
+<th>ID</th>
+<th>DNI</th>
+<th>NOMBRE</th>
+<th>FECHA NAC.</th>
+<th>SEXO</th>
+<th>TELÉFONO</th>
+<th>DIRECCIÓN</th>
+<th>OBSERVACIÓN</th>
+<th>ACCIÓN</th>
+</tr>
+
+</table>
+
+</div>
+
+</div>
+
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+/* SUPABASE */
+
+const SUPABASE_URL = "https://xxyrwyfraidlpzwpmiri.supabase.co";
+
+const SUPABASE_KEY = "sb_publishable_wFKPmmSGNxfL3UvgVzbrYQ_VbYf0LWC";
+
+const supabaseClient = supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+
+/* USUARIOS */
+
+const usuarios = [
+{
+usuario:"Miguel",
+password:"654321",
+rol:"CAJERA"
+},
+{
+usuario:"alexa",
+password:"123456",
+rol:"ADMINISTRADOR"
+}
+];
+
+/* LOGIN */
+
+function login(){
+
+let user=document.getElementById("usuario").value;
+let pass=document.getElementById("password").value;
+
+let encontrado=usuarios.find(
+u=>u.usuario===user && u.password===pass
+);
+
+if(encontrado){
+
+document.getElementById("loginPage").style.display="none";
+
+document.getElementById("sistema").style.display="block";
+
+document.getElementById("usuarioActivo").innerHTML=
+"Usuario: <b>"+encontrado.usuario+
+"</b> | Rol: <b>"+encontrado.rol+"</b>";
+
+cargarPacientes();
+
+}else{
+
+alert("Usuario o contraseña incorrecta");
+
+}
+
+}
+
+/* CERRAR SESION */
+
+function cerrarSesion(){
+
+location.reload();
+
+}
+
+/* MOSTRAR FORMULARIO */
+
+function mostrarFormulario(){
+
+let form=document.getElementById("formularioPaciente");
+
+if(form.style.display==="block"){
+
+form.style.display="none";
+
+}else{
+
+form.style.display="block";
+
+}
+
+}
+
+/* GUARDAR PACIENTE */
+
+async function guardarPaciente(){
+
+let dni=document.getElementById("dni").value;
+let nombre=document.getElementById("nombre").value;
+let fecha=document.getElementById("fecha").value;
+let sexo=document.getElementById("sexo").value;
+let telefono=document.getElementById("telefono").value;
+let direccion=document.getElementById("direccion").value;
+let observacion=document.getElementById("observacion").value;
+
+if(dni==="" || nombre===""){
+
+alert("Complete los datos");
+return;
+
+}
+
+/* INSERTAR EN SUPABASE */
+
+const { error } = await supabaseClient
+.from("pacientes")
+.insert([
+{
+dni:dni,
+nombre:nombre,
+fecha:fecha,
+sexo:sexo,
+telefono:telefono,
+direccion:direccion,
+observacion:observacion
+}
+]);
+
+if(error){
+
+console.log(error);
+
+alert("Error al guardar paciente");
+return;
+
+}
+
+alert("Paciente registrado correctamente");
+
+/* LIMPIAR */
+
+document.getElementById("dni").value="";
+document.getElementById("nombre").value="";
+document.getElementById("fecha").value="";
+document.getElementById("telefono").value="";
+document.getElementById("direccion").value="";
+document.getElementById("observacion").value="";
+
+/* RECARGAR TABLA */
+
+cargarPacientes();
+
+}
+
+/* CARGAR PACIENTES */
+
+async function cargarPacientes(){
+
+const { data, error } = await supabaseClient
+.from("pacientes")
+.select("*")
+.order("id",{ascending:true});
+
+if(error){
+
+console.log(error);
+return;
+
+}
+
+let tabla=`
+<tr>
+<th>ID</th>
+<th>DNI</th>
+<th>NOMBRE</th>
+<th>FECHA NAC.</th>
+<th>SEXO</th>
+<th>TELÉFONO</th>
+<th>DIRECCIÓN</th>
+<th>OBSERVACIÓN</th>
+<th>ACCIÓN</th>
+</tr>
+`;
+
+data.forEach((p,index)=>{
+
+tabla+=`
+<tr>
+
+<td>${p.id}</td>
+
+<td>${p.dni}</td>
+
+<td>${p.nombre}</td>
+
+<td>${p.fecha || ""}</td>
+
+<td>${p.sexo || ""}</td>
+
+<td>${p.telefono || ""}</td>
+
+<td>${p.direccion || ""}</td>
+
+<td>${p.observacion || ""}</td>
+
+<td>
+<button class="btn-delete"
+onclick="eliminarPaciente(${p.id})">
+Eliminar
+</button>
+</td>
+
+</tr>
+`;
+
+});
+
+document.getElementById("tablaPacientes").innerHTML=tabla;
+
+}
+
+/* ELIMINAR */
+
+async function eliminarPaciente(id){
+
+if(confirm("¿Eliminar paciente?")){
+
+const { error } = await supabaseClient
+.from("pacientes")
+.delete()
+.eq("id",id);
+
+if(error){
+
+alert("Error al eliminar");
+console.log(error);
+return;
+
+}
+
+alert("Paciente eliminado");
+
+cargarPacientes();
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
